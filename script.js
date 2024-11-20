@@ -13,7 +13,7 @@ async function loadTasks() {
     tasks.forEach(task => {
       const li = document.createElement('li');
       li.setAttribute('data-id', task._id);
-      li.classList.add(task.completed ? 'completed' : 'incomplete');
+      li.classList.add(task.completed ? 'completed' : 'incomplete'); // Wenn abgehakt, füge 'completed' hinzu
 
       // Aufgabe Text
       const taskText = document.createElement('span');

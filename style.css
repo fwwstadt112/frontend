@@ -77,3 +77,15 @@ li button {
 li button.done {
     background-color: #28a745;
 }
+
+/* Füge dies zu deiner style.css-Datei hinzu */
+
+.completed {
+  background-color: lightgray; /* Grau für abgehakte Aufgaben */
+  text-decoration: line-through; /* Durchgestrichen */
+}
+
+.incomplete {
+  background-color: white; /* Standardfarbe für nicht-abgehakte Aufgaben */
+}
+
