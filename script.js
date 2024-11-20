@@ -3,6 +3,11 @@ const API_URL = "backend-indol-six.vercel.app/api/tasks";
 document.addEventListener("DOMContentLoaded", () => {
     loadTasks();
 
+
+    const cors = require("cors");
+app.use(cors());
+
+    
     const form = document.getElementById("task-form");
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
