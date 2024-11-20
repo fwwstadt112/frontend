@@ -1,65 +1,83 @@
+// API URL
 const API_URL = 'https://backend-indol-six.vercel.app/api/tasks';
 
-// Funktion zum Hinzufügen einer Aufgabe
-async function addTask(event) {
-  event.preventDefault();  // Verhindert, dass das Formular die Seite neu lädt
-
-  const inputField = document.getElementById('task-input');
-  const taskText = inputField.value.trim();
-
-  if (taskText === '') {
-    alert('Bitte gib einen Aufgabetext ein');
-    return;
-  }
-
-  try {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text: taskText }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Fehler beim Hinzufügen der Aufgabe');
-    }
-
-    const newTask = await response.json();
-    console.log('Neue Aufgabe hinzugefügt:', newTask);
-
-    // Optionally: Update the task list after adding a new task
-    loadTasks(); // Diese Funktion lädt alle Aufgaben erneut
-
-    inputField.value = ''; // Leert das Eingabefeld
-  } catch (error) {
-    console.error('Fehler beim Hinzufügen der Aufgabe:', error);
-  }
-}
-
-// Event-Listener für das Formular
-const form = document.getElementById('task-form');
-form.addEventListener('submit', addTask);
-
-// Funktion zum Laden der Aufgaben (GET-Anfrage)
+// Funktion zum Laden der Aufgaben
 async function loadTasks() {
   try {
     const response = await fetch(API_URL);
     const tasks = await response.json();
 
-    // Hier kannst du dann die Aufgaben anzeigen
     const taskList = document.getElementById('task-list');
-    taskList.innerHTML = ''; // Alte Aufgaben entfernen
+    taskList.innerHTML = ''; // Leere die Liste
 
     tasks.forEach(task => {
-      const taskItem = document.createElement('li');
-      taskItem.textContent = `${task.text} - ${task.completed ? 'Erledigt' : 'Offen'}`;
-      taskList.appendChild(taskItem);
+      const li = document.createElement('li');
+      li.setAttribute('data-id', task._id);
+      li.classList.add(task.completed ? 'completed' : 'incomplete');
+
+      // Aufgabe Text
+      const taskText = document.createElement('span');
+      taskText.textContent = task.text;
+      li.appendChild(taskText);
+
+      // Abhaken Button
+      const checkButton = document.createElement('button');
+      checkButton.textContent = task.completed ? 'Unabhaken' : 'Abhaken';
+      checkButton.addEventListener('click', () => toggleTaskStatus(task._id, task.completed));
+      li.appendChild(checkButton);
+
+      // Löschen Button
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Löschen';
+      deleteButton.addEventListener('click', () => deleteTask(task._id));
+      li.appendChild(deleteButton);
+
+      taskList.appendChild(li);
     });
   } catch (error) {
     console.error('Fehler beim Laden der Aufgaben:', error);
   }
 }
 
-// Beim Laden der Seite Aufgaben laden
+// Funktion zum Abhaken der Aufgabe
+async function toggleTaskStatus(taskId, currentStatus) {
+  try {
+    const response = await fetch(`${API_URL}/${taskId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        completed: !currentStatus,
+      }),
+    });
+
+    if (response.ok) {
+      loadTasks(); // Lade die Aufgaben neu
+    } else {
+      console.error('Fehler beim Ändern des Status');
+    }
+  } catch (error) {
+    console.error('Fehler beim Abhaken der Aufgabe:', error);
+  }
+}
+
+// Funktion zum Löschen der Aufgabe
+async function deleteTask(taskId) {
+  try {
+    const response = await fetch(`${API_URL}/${taskId}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      loadTasks(); // Lade die Aufgaben neu
+    } else {
+      console.error('Fehler beim Löschen der Aufgabe');
+    }
+  } catch (error) {
+    console.error('Fehler beim Löschen der Aufgabe:', error);
+  }
+}
+
+// Aufgaben beim Laden der Seite anzeigen
 document.addEventListener('DOMContentLoaded', loadTasks);
