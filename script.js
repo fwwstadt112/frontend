@@ -1,57 +1,30 @@
-const API_URL = "const API_URL = "https://frontend-nu-jet-74.vercel.app/api/tasks";
-";
+const API_URL = "https://backend-indol-six.vercel.app/api/tasks"; // Hier die korrekte URL des Backends
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadTasks();
-
-
-    const cors = require("cors");
-app.use(cors());
-
-    
-    const form = document.getElementById("task-form");
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const input = document.getElementById("task-input");
-        const task = { text: input.value, done: false };
-        input.value = "";
-
-        await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(task),
-        });
-        loadTasks();
-    });
-});
-
+// Funktion, um Aufgaben vom Backend zu laden
 async function loadTasks() {
-    const res = await fetch(API_URL);
-    const tasks = await res.json();
-
-    const taskList = document.getElementById("task-list");
-    taskList.innerHTML = "";
-
-    tasks.forEach((task) => {
-        const li = document.createElement("li");
-        li.textContent = task.text;
-
-        const doneButton = document.createElement("button");
-        doneButton.textContent = "✓";
-        doneButton.className = "done";
-        doneButton.addEventListener("click", async () => {
-            await fetch(`${API_URL}/${task._id}`, { method: "PUT" });
-            loadTasks();
-        });
-
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "🗑️";
-        deleteButton.addEventListener("click", async () => {
-            await fetch(`${API_URL}/${task._id}`, { method: "DELETE" });
-            loadTasks();
-        });
-
-        li.append(doneButton, deleteButton);
-        taskList.append(li);
-    });
+  try {
+    const response = await fetch(API_URL); // Holt Aufgaben vom Backend
+    if (!response.ok) {
+      throw new Error(`HTTP Fehler! Status: ${response.status}`); // Überprüft, ob die Anfrage erfolgreich war
+    }
+    const tasks = await response.json(); // Wenn erfolgreich, JSON parsen
+    renderTasks(tasks); // Aufgaben in der UI anzeigen
+  } catch (error) {
+    console.error("Fehler beim Laden der Aufgaben:", error); // Fehlerbehandlung
+  }
 }
+
+// Funktion, um Aufgaben auf der Webseite anzuzeigen
+function renderTasks(tasks) {
+  const taskList = document.getElementById("task-list");
+  taskList.innerHTML = ""; // Löscht den Inhalt der Liste, falls nötig
+
+  tasks.forEach((task) => {
+    const taskItem = document.createElement("li");
+    taskItem.textContent = `${task.text} - ${task.completed ? "Erledigt" : "Offen"}`;
+    taskList.appendChild(taskItem); // Fügt jede Aufgabe der Liste hinzu
+  });
+}
+
+// Wenn das DOM geladen ist, Aufgaben laden
+document.addEventListener("DOMContentLoaded", loadTasks);
