@@ -1,4 +1,4 @@
-const API_URL = "https://<Vercel-Backend-URL>/api/tasks";
+const API_URL = "backend-indol-six.vercel.app/api/tasks";
 
 document.addEventListener("DOMContentLoaded", () => {
     loadTasks();
