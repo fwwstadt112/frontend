@@ -1,4 +1,4 @@
-const API_URL = 'https://frontend-nu-jet-74.vercel.app/api/tasks';
+const API_URL = 'https://backend-indol-six.vercel.app//api/tasks';
 
 // Funktion zum Hinzufügen einer Aufgabe
 async function addTask(event) {
